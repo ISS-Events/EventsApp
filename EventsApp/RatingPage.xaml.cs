@@ -2,27 +2,31 @@ namespace EventsApp;
 
 public partial class RatingPage : ContentPage
 {
-	public RatingPage()
-	{
-		InitializeComponent();
+    public RatingPage()
+    {
+        this.InitializeComponent();
         Entry entry = new Entry { Placeholder = "Enter text" };
-        entry.TextChanged += OnEntryTextChanged;
-        entry.Completed += OnEntryCompleted;
+        entry.TextChanged += this.OnEntryTextChanged;
+        entry.Completed += this.OnEntryCompleted;
     }
+
     private void CloseButton_Clicked(object sender, EventArgs e)
     {
-        Navigation.PopModalAsync();
+        this.Navigation.PopModalAsync();
     }
-    void OnEntryTextChanged(object sender, TextChangedEventArgs e)
+
+    public void OnEntryTextChanged(object sender, TextChangedEventArgs e)
     {
         string oldText = e.OldTextValue;
         string newText = e.NewTextValue;
-        string myText = entry.Text;
+        string myText = this.entry.Text;
     }
-    void OnEntryCompleted(object sender, EventArgs e)
+
+    public void OnEntryCompleted(object sender, EventArgs e)
     {
         string text = ((Entry)sender).Text;
     }
+
     private void OnStarClicked(object sender, EventArgs e)
     {
         ImageButton star = (ImageButton)sender;
@@ -35,6 +39,4 @@ public partial class RatingPage : ContentPage
             star.Source = "yellow_star.png";
         }
     }
-
-
 }

@@ -5,21 +5,25 @@ namespace EventsApp;
 public partial class BuyTicketAndDonatePage : ContentPage
 {
     private string eventGuid;
-    private Action _onPaymentReceived;
+    private Action onPaymentReceived;
     private PaymentMethod paymentMethod;
-    public enum PaymentMethod { Ticket, Donation };
+
+    public enum PaymentMethod
+    {
+        Ticket,
+        Donation
+    }
 
     public BuyTicketAndDonatePage(Guid eventGUID, Action onPaymentReceived, PaymentMethod paymentMethod)
     {
-        InitializeComponent();
-        eventGuid = eventGUID.ToString();
-        _onPaymentReceived = onPaymentReceived;
+        this.InitializeComponent();
+        this.eventGuid = eventGUID.ToString();
+        this.onPaymentReceived = onPaymentReceived;
         this.paymentMethod = paymentMethod;
     }
 
     private void BackImageButton_Clicked(object sender, EventArgs e)
     {
-
     }
 
     private void PayForTicket()
@@ -29,26 +33,26 @@ public partial class BuyTicketAndDonatePage : ContentPage
         string cvv = "123";
         DateTime expirationDate = new DateTime(2023, 12, 31);
 
-        EventsManager.BuyTicket(AppStateManager.currentUserGUID, Guid.Parse(eventGuid), cardHolderName, cardNumber, cvv, expirationDate);
+        EventsManager.BuyTicket(AppStateManager.CurrentUserGUID, Guid.Parse(this.eventGuid), cardHolderName, cardNumber, cvv, expirationDate);
     }
 
     private void PayForDonation()
     {
-        DonationsManager.AddDonation(AppStateManager.currentUserGUID, Guid.Parse(eventGuid), 10);
+        DonationsManager.AddDonation(AppStateManager.CurrentUserGUID, Guid.Parse(this.eventGuid), 10);
     }
 
     private void PayButton_Clicked(object sender, EventArgs e)
     {
-        if(paymentMethod == PaymentMethod.Ticket)
+        if (this.paymentMethod == PaymentMethod.Ticket)
         {
-            PayForTicket();
+            this.PayForTicket();
         }
-        else if(paymentMethod == PaymentMethod.Donation)
+        else if (this.paymentMethod == PaymentMethod.Donation)
         {
-            PayForDonation();
+            this.PayForDonation();
         }
 
-        _onPaymentReceived.Invoke();
-        Navigation.PopAsync();
+        this.onPaymentReceived.Invoke();
+        this.Navigation.PopAsync();
     }
 }

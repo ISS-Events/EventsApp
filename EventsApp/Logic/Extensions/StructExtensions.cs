@@ -1,12 +1,12 @@
-﻿using EventsApp.Logic.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Extensions
+﻿namespace EventsApp.Logic.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Attributes;
+
     public static class StructExtensions
     {
         public static Identifier GetIdentifier(this ValueType obj)
@@ -26,11 +26,12 @@ namespace EventsApp.Logic.Extensions
 
             return new Identifier(primaryKeys);
         }
-        
+
         // This is required since we can't force the generic type to be a struct
         // So, we can't access the GetIdentifiers method from the generic type
         // C# limitation <3
-        public static Identifier GetIdentifier<T>(this T obj) where T : struct
+        public static Identifier GetIdentifier<T>(this T obj)
+            where T : struct
         {
             Dictionary<string, object> primaryKeys = new Dictionary<string, object>();
 
@@ -54,7 +55,8 @@ namespace EventsApp.Logic.Extensions
             return (tableProp as TableAttribute)?.TableName;
         }
 
-        public static string GetTableName<T>(this T obj) where T : struct
+        public static string GetTableName<T>(this T obj)
+            where T : struct
         {
             var tableProp = obj.GetType().GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault();
             return (tableProp as TableAttribute)?.TableName;

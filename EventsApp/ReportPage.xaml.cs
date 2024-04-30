@@ -14,32 +14,55 @@ public partial class ReportPage : ContentPage
 
     public ReportPage(Guid userGuid, Guid eventGuid)
     {
-        InitializeComponent();
+        this.InitializeComponent();
         this.userGuid = userGuid;
         this.eventGuid = eventGuid;
-        BindingContext = this;
+        this.BindingContext = this;
     }
 
     private void CloseButton_Clicked(object sender, EventArgs e)
     {
-        Navigation.PopAsync();
+        this.Navigation.PopAsync();
     }
 
     private ReportInfo.ReportType GetFirstReportType()
     {
-        if (SpamCB.IsChecked) return ReportInfo.ReportType.Spam;
-        if (FraudCB.IsChecked) return ReportInfo.ReportType.Fraud;
-        if (HarrasmentCB.IsChecked) return ReportInfo.ReportType.Harassment;
-        if (OffensiveCB.IsChecked) return ReportInfo.ReportType.Offensive;
-        if (ViolationsCB.IsChecked) return ReportInfo.ReportType.Violence;
-        if (NudityCB.IsChecked) return ReportInfo.ReportType.Nudity;
+        if (this.SpamCB.IsChecked)
+        {
+            return ReportInfo.ReportType.Spam;
+        }
+
+        if (this.FraudCB.IsChecked)
+        {
+            return ReportInfo.ReportType.Fraud;
+        }
+
+        if (this.HarrasmentCB.IsChecked)
+        {
+            return ReportInfo.ReportType.Harassment;
+        }
+
+        if (this.OffensiveCB.IsChecked)
+        {
+            return ReportInfo.ReportType.Offensive;
+        }
+
+        if (this.ViolationsCB.IsChecked)
+        {
+            return ReportInfo.ReportType.Violence;
+        }
+
+        if (this.NudityCB.IsChecked)
+        {
+            return ReportInfo.ReportType.Nudity;
+        }
 
         return ReportInfo.ReportType.None;
     }
 
     private void Button_Clicked(object sender, EventArgs e)
     {
-        ReportsManager.AddReport(userGuid, eventGuid, GetFirstReportType());
-        Navigation.PopAsync();
+        ReportsManager.AddReport(this.userGuid, this.eventGuid, this.GetFirstReportType());
+        this.Navigation.PopAsync();
     }
 }

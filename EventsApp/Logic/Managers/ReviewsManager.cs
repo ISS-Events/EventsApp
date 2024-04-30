@@ -1,48 +1,48 @@
-﻿using EventsApp.Logic.Adapters;
-using EventsApp.Logic.Entities;
-using EventsApp.Logic.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Managers
+﻿namespace EventsApp.Logic.Managers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Adapters;
+    using EventsApp.Logic.Entities;
+    using EventsApp.Logic.Extensions;
+
     public static class ReviewsManager
     {
-        private static DataAdapter<ReviewInfo> _adapter;
+        private static DataAdapter<ReviewInfo> adapter;
 
         public static void Initialize(DataAdapter<ReviewInfo> adapter)
         {
-            _adapter = adapter;
+            ReviewsManager.adapter = adapter;
         }
 
         public static ReviewInfo GetReview(Guid reviewerId, Guid eventId)
         {
             ReviewInfo review = new ReviewInfo(reviewerId, eventId);
-            return _adapter.Get(review.GetIdentifier());
+            return adapter.Get(review.GetIdentifier());
         }
 
         public static List<ReviewInfo> GetAllReviews()
         {
-            return _adapter.GetAll();
+            return adapter.GetAll();
         }
 
         public static void AddReview(Guid reviewerId, Guid eventId, float score, string description)
         {
             ReviewInfo review = new ReviewInfo(reviewerId, eventId, score, description);
 
-            _adapter.Add(review);
+            adapter.Add(review);
         }
 
         public static List<ReviewInfo> GetAllReviewsOfReviewer(Guid reviewer)
         {
             List<ReviewInfo> reviews = new List<ReviewInfo>();
 
-            foreach (ReviewInfo review in _adapter.GetAll())
+            foreach (ReviewInfo review in adapter.GetAll())
             {
-                if (review.userGUID == reviewer)
+                if (review.UserGUID == reviewer)
                 {
                     reviews.Add(review);
                 }
@@ -55,9 +55,9 @@ namespace EventsApp.Logic.Managers
         {
             List<ReviewInfo> reviews = new List<ReviewInfo>();
 
-            foreach (ReviewInfo review in _adapter.GetAll())
+            foreach (ReviewInfo review in adapter.GetAll())
             {
-                if (review.eventGUID == eventId)
+                if (review.EventGUID == eventId)
                 {
                     reviews.Add(review);
                 }
@@ -79,15 +79,15 @@ namespace EventsApp.Logic.Managers
             return reviews;
         }
 
-    
         public static float GetReviewsAverageScoreOfUser(Guid userId)
         {
             List<ReviewInfo> userReviews = GetAllReviewsOfUser(userId);
             float averageScore = 0;
             foreach (ReviewInfo review in userReviews)
             {
-                averageScore += review.score;
+                averageScore += review.Score;
             }
+
             averageScore /= userReviews.Count;
             return averageScore;
         }

@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Intrinsics.Arm;
-using System.Text;
-using System.Threading.Tasks;
-using EventsApp.Logic.Entities;
-using Bogus;
-
-namespace EventsApp.Logic.Managers
+﻿namespace EventsApp.Logic.Managers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.Intrinsics.Arm;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Bogus;
+    using EventsApp.Logic.Entities;
+
     public static class Dummy
     {
-        public static Random random = new Random();
+        public static Random Random = new Random();
 
         public static void Populate()
         {
@@ -19,18 +19,16 @@ namespace EventsApp.Logic.Managers
             PopulateUsers(10);
             PopulateEvents(10);
             PopulateStatuses();
-            //List<UserInfo> users = UsersManager.GetAllUsers();
-            //List<EventInfo> events = EventsManager.GetAllEvents();
+            // List<UserInfo> users = UsersManager.GetAllUsers();
+            // List<EventInfo> events = EventsManager.GetAllEvents();
         }
 
         public static void AddCurrentlyLoggedUser()
         {
-            UserInfo currentUser = new UserInfo
-            (
-                AppStateManager.currentUserGUID,
-                AppStateManager.name,
-                AppStateManager.password
-            );
+            UserInfo currentUser = new UserInfo(
+                AppStateManager.CurrentUserGUID,
+                AppStateManager.Name,
+                AppStateManager.Password);
 
             UsersManager.AddNewUser(currentUser);
         }
@@ -40,7 +38,7 @@ namespace EventsApp.Logic.Managers
             for (int i = 0; i < count; i++)
             {
                 UserInfo userInfo = GenerateRandomUser();
-                UsersManager.AddNewUser(userInfo.name, userInfo.password);
+                UsersManager.AddNewUser(userInfo.Name, userInfo.Password);
             }
         }
 
@@ -59,14 +57,14 @@ namespace EventsApp.Logic.Managers
             List<EventInfo> events = EventsManager.GetAllEvents();
             foreach (UserInfo userInfo in users)
             {
-                Guid eventGuid = events[random.Next(events.Count)].GUID;
+                Guid eventGuid = events[Random.Next(events.Count)].GUID;
                 UsersManager.SetInterestedStatus(userInfo.GUID, eventGuid);
                 UsersManager.SetGoingStatus(userInfo.GUID, eventGuid);
             }
 
             foreach (EventInfo eventInfo in events)
             {
-                Guid userGuid = AppStateManager.currentUserGUID;
+                Guid userGuid = AppStateManager.CurrentUserGUID;
                 UsersManager.SetInterestedStatus(userGuid, eventInfo.GUID);
             }
         }
@@ -77,8 +75,7 @@ namespace EventsApp.Logic.Managers
             // logoUrl, ageLimit, entryFee
             Faker faker = new Faker();
 
-            EventInfo eventInfo = new EventInfo
-            (
+            EventInfo eventInfo = new EventInfo(
                 organizerGuid,
                 faker.Company.CompanyName(),
                 faker.Commerce.Categories(1)[0],
@@ -90,8 +87,7 @@ namespace EventsApp.Logic.Managers
                 faker.Image.PicsumUrl(),
                 faker.Image.PicsumUrl(),
                 faker.Random.Int(1, 100),
-                faker.Random.Int(0, 100)
-            );
+                faker.Random.Int(0, 100));
 
             return eventInfo;
         }
@@ -102,8 +98,8 @@ namespace EventsApp.Logic.Managers
 
             UserInfo userInfo = new UserInfo
             {
-                name = faker.Internet.UserName(),
-                password = faker.Internet.Password()
+                Name = faker.Internet.UserName(),
+                Password = faker.Internet.Password(),
             };
 
             return userInfo;
@@ -111,12 +107,12 @@ namespace EventsApp.Logic.Managers
 
         public static Guid GetRandomUserGUID()
         {
-            return UsersManager.GetAllUsers()[random.Next(UsersManager.GetAllUsers().Count)].GUID;
+            return UsersManager.GetAllUsers()[Random.Next(UsersManager.GetAllUsers().Count)].GUID;
         }
 
         public static Guid GetRandomEventGUID()
         {
-            return EventsManager.GetAllEvents()[random.Next(EventsManager.GetAllEvents().Count)].GUID;
+            return EventsManager.GetAllEvents()[Random.Next(EventsManager.GetAllEvents().Count)].GUID;
         }
     }
 }

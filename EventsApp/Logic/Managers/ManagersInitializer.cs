@@ -1,36 +1,36 @@
-﻿using EventsApp.Logic.Adapters;
-using EventsApp.Logic.Entities;
-using System;
-using Microsoft.Data.SqlClient;
-using System.Data;
-using System.Reflection;
-using EventsApp.Logic.Attributes;
-using EventsApp.Logic.Extensions;
-
-namespace EventsApp.Logic.Managers
+﻿namespace EventsApp.Logic.Managers
 {
+    using System;
+    using System.Data;
+    using System.Reflection;
+    using EventsApp.Logic.Adapters;
+    using EventsApp.Logic.Attributes;
+    using EventsApp.Logic.Entities;
+    using EventsApp.Logic.Extensions;
+    using Microsoft.Data.SqlClient;
+
     public static class ManagersInitializer
     {
-        public static string connectionString;
+        public static string ConnectionString;
 
         public static void Initialize()
         {
             // Setting up connections
-            //CSVAdapter<UserInfo> usersCSVAdapter = new CSVAdapter<UserInfo>("UsersCSV");
-            //CSVAdapter<Entities.EventInfo> eventsCSVAdapter = new CSVAdapter<Entities.EventInfo>("EventsCSV");
-            //usersCSVAdapter.Connect();
-            //eventsCSVAdapter.Connect();
+            // CSVAdapter<UserInfo> usersCSVAdapter = new CSVAdapter<UserInfo>("UsersCSV");
+            // CSVAdapter<Entities.EventInfo> eventsCSVAdapter = new CSVAdapter<Entities.EventInfo>("EventsCSV");
+            // usersCSVAdapter.Connect();
+            // eventsCSVAdapter.Connect();
             bool regenerateDB = false;
 
             SetupDB(true, true, regenerateDB);
 
-            DataBaseAdapter<UserInfo> usersAdapter = new DataBaseAdapter<UserInfo>(connectionString);
-            DataBaseAdapter<Entities.EventInfo> eventsAdapter = new DataBaseAdapter<Entities.EventInfo>(connectionString);
-            DataBaseAdapter<ReportInfo> reportsAdapter = new DataBaseAdapter<ReportInfo>(connectionString);
-            DataBaseAdapter<ReviewInfo> reviewsAdapter = new DataBaseAdapter<ReviewInfo>(connectionString);
-            DataBaseAdapter<AdminInfo> adminsAdapter = new DataBaseAdapter<AdminInfo>(connectionString);
-            DataBaseAdapter<UserEventRelationInfo> userEventRelationsAdapter = new DataBaseAdapter<UserEventRelationInfo>(connectionString);
-            DataBaseAdapter<DonationInfo> donationsAdapter = new DataBaseAdapter<DonationInfo>(connectionString);
+            DataBaseAdapter<UserInfo> usersAdapter = new DataBaseAdapter<UserInfo>(ConnectionString);
+            DataBaseAdapter<Entities.EventInfo> eventsAdapter = new DataBaseAdapter<Entities.EventInfo>(ConnectionString);
+            DataBaseAdapter<ReportInfo> reportsAdapter = new DataBaseAdapter<ReportInfo>(ConnectionString);
+            DataBaseAdapter<ReviewInfo> reviewsAdapter = new DataBaseAdapter<ReviewInfo>(ConnectionString);
+            DataBaseAdapter<AdminInfo> adminsAdapter = new DataBaseAdapter<AdminInfo>(ConnectionString);
+            DataBaseAdapter<UserEventRelationInfo> userEventRelationsAdapter = new DataBaseAdapter<UserEventRelationInfo>(ConnectionString);
+            DataBaseAdapter<DonationInfo> donationsAdapter = new DataBaseAdapter<DonationInfo>(ConnectionString);
 
             UsersManager.Initialize(usersAdapter, adminsAdapter, userEventRelationsAdapter);
             EventsManager.Initialize(eventsAdapter, userEventRelationsAdapter);
@@ -38,7 +38,10 @@ namespace EventsApp.Logic.Managers
             ReviewsManager.Initialize(reviewsAdapter);
             DonationsManager.Initialize(donationsAdapter);
 
-            if(regenerateDB) Dummy.Populate();
+            if (regenerateDB)
+            {
+                Dummy.Populate();
+            }
         }
 
         public static void SetupDB(bool wipeExisting = false, bool azure = true, bool dropTables = false)
@@ -54,17 +57,20 @@ namespace EventsApp.Logic.Managers
                 builder.InitialCatalog = "master";
                 builder.IntegratedSecurity = false; // Use Windows Authentication
                 builder.TrustServerCertificate = true; // Trust the server certificate
-                connectionString = builder.ConnectionString;
+                ConnectionString = builder.ConnectionString;
 
                 // Azure connection string
-                if (!wipeExisting) return;
+                if (!wipeExisting)
+                {
+                    return;
+                }
 
                 // SQL command to create the database
                 string dropDatabaseQuery = "DROP DATABASE IF EXISTS EventsDB";
                 string createDatabaseQuery = $"CREATE DATABASE EventsDB ON PRIMARY (NAME = EventsDB, FILENAME = '{dbPath}')";
 
                 // Drop the database if it already exists
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
                 {
                     SqlCommand command = new SqlCommand(dropDatabaseQuery, connection);
                     try
@@ -79,7 +85,7 @@ namespace EventsApp.Logic.Managers
                 }
 
                 // Create connection and command objects
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
                 {
                     SqlCommand command = new SqlCommand(createDatabaseQuery, connection);
                     try
@@ -96,7 +102,7 @@ namespace EventsApp.Logic.Managers
                 }
             }
 
-            connectionString = AppDataInfo.AzureConnectionString;
+            ConnectionString = AppDataInfo.AzureConnectionString;
 
             // ------------------- Create tables -------------------
             if (dropTables)
@@ -116,7 +122,7 @@ namespace EventsApp.Logic.Managers
                     // Drop table if exists
                     string dropTableQuery = $"DROP TABLE IF EXISTS {tableName}";
 
-                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    using (SqlConnection connection = new SqlConnection(ConnectionString))
                     {
                         SqlCommand command = new SqlCommand(dropTableQuery, connection);
                         try
@@ -153,14 +159,14 @@ namespace EventsApp.Logic.Managers
                             primaryKeyString += field.Name + ", ";
                         }
                     }
+
                     primaryKeyString = primaryKeyString.Remove(primaryKeyString.Length - 2) + ")";
 
                     columns.Add(primaryKeyString);
 
                     string createTableQuery = $"CREATE TABLE {tableName} ({string.Join(", ", columns)})";
 
-
-                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    using (SqlConnection connection = new SqlConnection(ConnectionString))
                     {
                         SqlCommand command = new SqlCommand(createTableQuery, connection);
                         try

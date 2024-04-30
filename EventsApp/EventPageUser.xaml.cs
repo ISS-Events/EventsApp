@@ -5,132 +5,134 @@ namespace EventsApp;
 
 public partial class EventPageUser : ContentPage
 {
-    string eventGuid;
-    bool isOrganizerMode = false;
+    public string EventGuid;
+    public bool IsOrganizerMode = false;
+
     public Event Event { get; set; }
 
     public EventPageUser(string guid)
     {
-        InitializeComponent();
+        this.InitializeComponent();
 
-        eventGuid = guid;
-        Event = new Event(EventsManager.GetEvent(Guid.Parse(guid)));
-        BindingContext = this;
+        this.EventGuid = guid;
+        this.Event = new Event(EventsManager.GetEvent(Guid.Parse(guid)));
+        this.BindingContext = this;
 
-        isOrganizerMode = EventsManager.IsOrganizer(AppStateManager.currentUserGUID, Guid.Parse(guid));
+        this.IsOrganizerMode = EventsManager.IsOrganizer(AppStateManager.CurrentUserGUID, Guid.Parse(guid));
 
-        UpdateProperties();
-        UpdateInterestedStatus();
-        UpdateGoingStatus();
+        this.UpdateProperties();
+        this.UpdateInterestedStatus();
+        this.UpdateGoingStatus();
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        RefreshEvent();
-        //RefreshInterestedStars();
+        this.RefreshEvent();
+        // RefreshInterestedStars();
     }
 
     private void RefreshEvent()
     {
-        Event = new Event(EventsManager.GetEvent(Guid.Parse(eventGuid)));
-        BindingContext = this;
-        OnPropertyChanged(nameof(Event));
+        this.Event = new Event(EventsManager.GetEvent(Guid.Parse(this.EventGuid)));
+        this.BindingContext = this;
+        this.OnPropertyChanged(nameof(this.Event));
     }
 
     private void UpdateProperties()
     {
-        buyTicketButton.Text = isOrganizerMode ? "Edit Event" : "Buy Ticket";
+        this.buyTicketButton.Text = this.IsOrganizerMode ? "Edit Event" : "Buy Ticket";
     }
 
     private void UpdateInterestedStatus()
     {
-        if (UsersManager.IsInterested(AppStateManager.currentUserGUID, Guid.Parse(eventGuid)))
+        if (UsersManager.IsInterested(AppStateManager.CurrentUserGUID, Guid.Parse(this.EventGuid)))
         {
-            interestedImageButton.Source = "star_filled.png";
+            this.interestedImageButton.Source = "star_filled.png";
         }
         else
         {
-            interestedImageButton.Source = "star_empty.png";
+            this.interestedImageButton.Source = "star_empty.png";
         }
     }
 
     private void DonateButton_Clicked(object sender, EventArgs e)
     {
         // Open BuyTicketPage
-        if (Event != null)
+        if (this.Event != null)
         {
-            Navigation.PushAsync(new BuyTicketAndDonatePage(Guid.Parse(Event.GUID), () => OnDonationPaymentReceived(), BuyTicketAndDonatePage.PaymentMethod.Donation));
+            this.Navigation.PushAsync(new BuyTicketAndDonatePage(Guid.Parse(this.Event.GUID), () => this.OnDonationPaymentReceived(), BuyTicketAndDonatePage.PaymentMethod.Donation));
         }
     }
 
     private void OnDonationPaymentReceived()
     {
-        UpdateGoingStatus();
-        UpdateInterestedStatus();
+        this.UpdateGoingStatus();
+        this.UpdateInterestedStatus();
     }
 
     private void OnTickedPaymentReceived()
     {
-        UpdateGoingStatus();
-        UpdateInterestedStatus();
+        this.UpdateGoingStatus();
+        this.UpdateInterestedStatus();
     }
 
     private void UpdateGoingStatus()
     {
-        if (UsersManager.IsGoing(AppStateManager.currentUserGUID, Guid.Parse(eventGuid)))
+        if (UsersManager.IsGoing(AppStateManager.CurrentUserGUID, Guid.Parse(this.EventGuid)))
         {
-            goingImageButton.BackgroundColor = Color.FromHex("#FFD700");
+            this.goingImageButton.BackgroundColor = Color.FromHex("#FFD700");
         }
         else
         {
-            goingImageButton.BackgroundColor = Color.FromHex("#FFFFFF");
+            this.goingImageButton.BackgroundColor = Color.FromHex("#FFFFFF");
         }
     }
 
     private void InterestedImageButton_Clicked(object sender, EventArgs e)
     {
-        if (UsersManager.IsInterested(AppStateManager.currentUserGUID, Guid.Parse(eventGuid)))
+        if (UsersManager.IsInterested(AppStateManager.CurrentUserGUID, Guid.Parse(this.EventGuid)))
         {
-            UsersManager.RemoveInterestedStatus(AppStateManager.currentUserGUID, Guid.Parse(eventGuid));
+            UsersManager.RemoveInterestedStatus(AppStateManager.CurrentUserGUID, Guid.Parse(this.EventGuid));
         }
         else
         {
-            UsersManager.SetInterestedStatus(AppStateManager.currentUserGUID, Guid.Parse(eventGuid));
+            UsersManager.SetInterestedStatus(AppStateManager.CurrentUserGUID, Guid.Parse(this.EventGuid));
         }
 
-        UpdateInterestedStatus();
+        this.UpdateInterestedStatus();
     }
 
     private void BuyTicketButton_Clicked(object sender, EventArgs e)
     {
-        if (Event == null) return;
-
-        if (isOrganizerMode)
+        if (this.Event == null)
         {
-            Navigation.PushAsync(new AddOrEditPage(AppStateManager.currentUserGUID, Guid.Parse(Event.GUID), true));
+            return;
+        }
+
+        if (this.IsOrganizerMode)
+        {
+            this.Navigation.PushAsync(new AddOrEditPage(AppStateManager.CurrentUserGUID, Guid.Parse(this.Event.GUID), true));
         }
         else
         {
-            Navigation.PushAsync(new BuyTicketAndDonatePage(Guid.Parse(Event.GUID), () => OnTickedPaymentReceived(), BuyTicketAndDonatePage.PaymentMethod.Ticket));
+            this.Navigation.PushAsync(new BuyTicketAndDonatePage(Guid.Parse(this.Event.GUID), () => this.OnTickedPaymentReceived(), BuyTicketAndDonatePage.PaymentMethod.Ticket));
         }
 
-
-        UpdateGoingStatus();
+        this.UpdateGoingStatus();
     }
 
     private void ShareImageButton_Clicked(object sender, EventArgs e)
     {
-        Navigation.PushAsync(new UserSharePage(AppStateManager.currentUserGUID, Guid.Parse(eventGuid)));
+        this.Navigation.PushAsync(new UserSharePage(AppStateManager.CurrentUserGUID, Guid.Parse(this.EventGuid)));
     }
 
     private void ReportImageButton_Clicked(object sender, EventArgs e)
     {
-        Navigation.PushAsync(new ReportPage(AppStateManager.currentUserGUID, Guid.Parse(eventGuid)));
+        this.Navigation.PushAsync(new ReportPage(AppStateManager.CurrentUserGUID, Guid.Parse(this.EventGuid)));
     }
 
     private void BackImageButton_Clicked(object sender, EventArgs e)
     {
-
     }
 }

@@ -1,39 +1,39 @@
-﻿using EventsApp.Logic.Adapters;
-using EventsApp.Logic.Attributes;
-using EventsApp.Logic.Entities;
-using EventsApp.Logic.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Managers
+﻿namespace EventsApp.Logic.Managers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net.NetworkInformation;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Adapters;
+    using EventsApp.Logic.Attributes;
+    using EventsApp.Logic.Entities;
+    using EventsApp.Logic.Extensions;
+
     public static class UsersManager
     {
-        private static DataAdapter<UserInfo> _usersAdapter;
-        private static DataAdapter<AdminInfo> _adminsAdapter;
-        private static DataAdapter<UserEventRelationInfo> _userEventRelationsAdapter;
+        private static DataAdapter<UserInfo> usersAdapter;
+        private static DataAdapter<AdminInfo> adminsAdapter;
+        private static DataAdapter<UserEventRelationInfo> userEventRelationsAdapter;
 
         public static void Initialize(DataAdapter<UserInfo> usersAdapter, DataAdapter<AdminInfo> adminsAdapter, DataAdapter<UserEventRelationInfo> userEventRelationsAdapter)
         {
-            _usersAdapter = usersAdapter;
-            _adminsAdapter = adminsAdapter;
-            _userEventRelationsAdapter = userEventRelationsAdapter;
+            UsersManager.usersAdapter = usersAdapter;
+            UsersManager.adminsAdapter = adminsAdapter;
+            UsersManager.userEventRelationsAdapter = userEventRelationsAdapter;
         }
 
         public static UserInfo GetUser(Guid userId)
         {
             UserInfo userInfo = new UserInfo(userId);
-            return _usersAdapter.Get(userInfo.GetIdentifier());
+            return usersAdapter.Get(userInfo.GetIdentifier());
         }
 
         public static List<UserInfo> GetAllUsers()
         {
-            return _usersAdapter.GetAll();
+            return usersAdapter.GetAll();
         }
 
         public static bool IsAdmin(Guid userId)
@@ -53,14 +53,14 @@ namespace EventsApp.Logic.Managers
             List<UserInfo> foundUsers = new List<UserInfo>();
             foreach (UserInfo user in GetAllUsers())
             {
-                if (user.name.StartsWith(usernameString))
+                if (user.Name.StartsWith(usernameString))
                 {
                     foundUsers.Add(user);
                 }
             }
+
             return foundUsers;
         }
-
 
         public static void SendNotificationToUser(Guid userInvitedId, string message)
         {
@@ -69,62 +69,68 @@ namespace EventsApp.Logic.Managers
 
         public static void AddNewUser(UserInfo user)
         {
-            _usersAdapter.Add(user);
+            usersAdapter.Add(user);
         }
 
         public static void AddNewUser(string name, string password)
         {
             UserInfo userInfo = new UserInfo(name, password);
-            _usersAdapter.Add(userInfo);
+            usersAdapter.Add(userInfo);
         }
 
         public static void InviteUser(Guid userId, Guid eventId, Guid userInvitedId)
         {
-            SendNotificationToUser(userInvitedId, $"You have been invited to the event {EventsManager.GetEvent(eventId).eventName}! by {GetUser(userId).name}");
+            SendNotificationToUser(userInvitedId, $"You have been invited to the event {EventsManager.GetEvent(eventId).EventName}! by {GetUser(userId).Name}");
         }
 
         public static void SetInterestedStatus(Guid userId, Guid eventId)
         {
             UserEventRelationInfo userEventRelationInfo = new UserEventRelationInfo(userId, eventId, "interested");
 
-            if(!_userEventRelationsAdapter.Contains(userEventRelationInfo.GetIdentifier()))
+            if (!userEventRelationsAdapter.Contains(userEventRelationInfo.GetIdentifier()))
             {
-                _userEventRelationsAdapter.Add(userEventRelationInfo);
+                userEventRelationsAdapter.Add(userEventRelationInfo);
                 return;
             }
 
-            _userEventRelationsAdapter.Update(userEventRelationInfo.GetIdentifier(), userEventRelationInfo);
+            userEventRelationsAdapter.Update(userEventRelationInfo.GetIdentifier(), userEventRelationInfo);
         }
 
         public static void SetGoingStatus(Guid userId, Guid eventId)
         {
             UserEventRelationInfo userEventRelationInfo = new UserEventRelationInfo(userId, eventId, "going");
 
-            if (!_userEventRelationsAdapter.Contains(userEventRelationInfo.GetIdentifier()))
+            if (!userEventRelationsAdapter.Contains(userEventRelationInfo.GetIdentifier()))
             {
-                _userEventRelationsAdapter.Add(userEventRelationInfo);
+                userEventRelationsAdapter.Add(userEventRelationInfo);
                 return;
             }
 
-            _userEventRelationsAdapter.Update(userEventRelationInfo.GetIdentifier(), userEventRelationInfo);
+            userEventRelationsAdapter.Update(userEventRelationInfo.GetIdentifier(), userEventRelationInfo);
         }
 
         public static void RemoveInterestedStatus(Guid userId, Guid eventId)
         {
             bool isGoing = IsGoing(userId, eventId);
-            if (isGoing) return;
+            if (isGoing)
+            {
+                return;
+            }
 
             UserEventRelationInfo userEventRelationInfo = new UserEventRelationInfo(userId, eventId);
-            _userEventRelationsAdapter.Delete(userEventRelationInfo.GetIdentifier());
+            userEventRelationsAdapter.Delete(userEventRelationInfo.GetIdentifier());
         }
 
         public static bool IsInterested(Guid userId, Guid eventId)
         {
             UserEventRelationInfo userEventRelationInfo = new UserEventRelationInfo(userId, eventId);
 
-            if (!_userEventRelationsAdapter.Contains(userEventRelationInfo.GetIdentifier())) return false;
+            if (!userEventRelationsAdapter.Contains(userEventRelationInfo.GetIdentifier()))
+            {
+                return false;
+            }
 
-            string status = _userEventRelationsAdapter.Get(userEventRelationInfo.GetIdentifier()).status;
+            string status = userEventRelationsAdapter.Get(userEventRelationInfo.GetIdentifier()).Status;
 
             return status == "interested" || status == "going";
         }
@@ -133,9 +139,12 @@ namespace EventsApp.Logic.Managers
         {
             UserEventRelationInfo userEventRelationInfo = new UserEventRelationInfo(userId, eventId);
 
-            if (!_userEventRelationsAdapter.Contains(userEventRelationInfo.GetIdentifier())) return false;
+            if (!userEventRelationsAdapter.Contains(userEventRelationInfo.GetIdentifier()))
+            {
+                return false;
+            }
 
-            return _userEventRelationsAdapter.Get(userEventRelationInfo.GetIdentifier()).status == "going";
+            return userEventRelationsAdapter.Get(userEventRelationInfo.GetIdentifier()).Status == "going";
         }
     }
 }

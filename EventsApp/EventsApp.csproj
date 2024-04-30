@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks>net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
@@ -13,7 +13,7 @@
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
-		<OutputType>Exe</OutputType>
+		<OutputType Condition="'$(TargetFramework)' != 'net8.0'">Exe</OutputType>
 		<RootNamespace>EventsApp</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
@@ -39,35 +39,35 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
-	  <ApplicationId>com.VITeam.EventsApp</ApplicationId>
+		<ApplicationId>com.VITeam.EventsApp</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-	  <ApplicationId>com.VITeam.EventsApp</ApplicationId>
+		<ApplicationId>com.VITeam.EventsApp</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
-	  <ApplicationId>com.VITeam.EventsApp</ApplicationId>
+		<ApplicationId>com.VITeam.EventsApp</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationId>com.VITeam.EventsApp</ApplicationId>
+		<ApplicationId>com.VITeam.EventsApp</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <ApplicationId>com.VITeam.EventsApp</ApplicationId>
+		<ApplicationId>com.VITeam.EventsApp</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
-	  <ApplicationId>com.VITeam.EventsApp</ApplicationId>
+		<ApplicationId>com.VITeam.EventsApp</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
-	  <ApplicationId>com.VITeam.EventsApp</ApplicationId>
+		<ApplicationId>com.VITeam.EventsApp</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationId>com.VITeam.EventsApp</ApplicationId>
+		<ApplicationId>com.VITeam.EventsApp</ApplicationId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -89,91 +89,105 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Images\back_arrow.svg" />
-	  <None Remove="Resources\Images\calendar.svg" />
-	  <None Remove="Resources\Images\checkedbox.svg" />
-	  <None Remove="Resources\Images\clock.svg" />
-	  <None Remove="Resources\Images\event_logo.jpg" />
-	  <None Remove="Resources\Images\location.svg" />
-	  <None Remove="Resources\Images\plus_white.svg" />
-	  <None Remove="Resources\Images\star_empty.png" />
-	  <None Remove="Resources\Images\star_filled.png" />
-	  <None Remove="Resources\Images\ticket.svg" />
-	  <None Remove="Resources\Images\ubb_logo.png" />
-	  <None Remove="Resources\Images\white_star.png" />
-	  <None Remove="Resources\Images\yellow_star.png" />
+		<None Remove="Resources\Images\back_arrow.svg" />
+		<None Remove="Resources\Images\calendar.svg" />
+		<None Remove="Resources\Images\checkedbox.svg" />
+		<None Remove="Resources\Images\clock.svg" />
+		<None Remove="Resources\Images\event_logo.jpg" />
+		<None Remove="Resources\Images\location.svg" />
+		<None Remove="Resources\Images\plus_white.svg" />
+		<None Remove="Resources\Images\star_empty.png" />
+		<None Remove="Resources\Images\star_filled.png" />
+		<None Remove="Resources\Images\ticket.svg" />
+		<None Remove="Resources\Images\ubb_logo.png" />
+		<None Remove="Resources\Images\white_star.png" />
+		<None Remove="Resources\Images\yellow_star.png" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Bogus" Version="35.5.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)">
+		  <TreatAsUsed>true</TreatAsUsed>
+		</PackageReference>
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Logic\GUI\" />
-	  <Folder Include="Storage\" />
+		<Folder Include="Logic\GUI\" />
+		<Folder Include="Storage\" />
 	</ItemGroup>
 
 	<ItemGroup>
 
-	  <Compile Update="EventPageOrganizerSponsor.xaml.cs">
-	    <DependentUpon>EventPageOrganizerSponsor.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="EventPageUser.xaml.cs">
-	    <DependentUpon>EventPageUser.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="MainPageOld.xaml.cs">
-	    <DependentUpon>MainPageOld.xaml</DependentUpon>
-	  </Compile>
+		<Compile Update="EventPageOrganizerSponsor.xaml.cs">
+			<DependentUpon>EventPageOrganizerSponsor.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="EventPageUser.xaml.cs">
+			<DependentUpon>EventPageUser.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="MainPageOld.xaml.cs">
+			<DependentUpon>MainPageOld.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="AddOrEditPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="BuyTicketAndDonatePage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="EventPageOrganizerSponsor.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="EventPageUser.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="MainPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="MainPageOld.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="RatingPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="ReportPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="ReportsPage - Copy.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="ReportsPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="ReviewsPage - Copy.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="ReviewsPage.xaml">
-      </MauiXaml>
+		<MauiXaml Update="AddOrEditPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="BuyTicketAndDonatePage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="EventPageOrganizerSponsor.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="EventPageUser.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="MainPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="MainPageOld.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="RatingPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="ReportPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="ReportsPage - Copy.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="ReportsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="ReviewsPage - Copy.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="ReviewsPage.xaml">
+		</MauiXaml>
 
-	  <MauiXaml Update="EventInfoPage.xaml">
+		<MauiXaml Update="EventInfoPage.xaml">
 
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
 
-	<ProjectExtensions><VisualStudio><UserProperties XamarinHotReloadDebuggerTimeoutExceptionEventsAppHideInfoBar="True" /></VisualStudio></ProjectExtensions>
+	<ProjectExtensions>
+		<VisualStudio>
+			<UserProperties XamarinHotReloadDebuggerTimeoutExceptionEventsAppHideInfoBar="True" />
+		</VisualStudio>
+	</ProjectExtensions>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<CodeAnalysisRuleSet>SE.ruleset</CodeAnalysisRuleSet>
+	</PropertyGroup>
 
 </Project>

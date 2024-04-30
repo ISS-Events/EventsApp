@@ -5,26 +5,27 @@ namespace EventsApp;
 
 public partial class ReportsPage : ContentPage
 {
-    public List<ViewReports> usersReports;
+    public List<ViewReports> UsersReports;
     private Guid eventGuid;
-	public ReportsPage(Guid eventGuid)
-	{
-		InitializeComponent();
+
+    public ReportsPage(Guid eventGuid)
+    {
+        this.InitializeComponent();
         this.eventGuid = eventGuid;
-        usersReports = GetReports();
-        reportsListView.ItemsSource = usersReports;
-        BindingContext = this;
+        this.UsersReports = this.GetReports();
+        this.reportsListView.ItemsSource = this.UsersReports;
+        this.BindingContext = this;
     }
 
     private List<ViewReports> GetReports()
     {
-        List<ReportInfo> reportInfos = ReportsManager.GetReportsForEvent(eventGuid);
+        List<ReportInfo> reportInfos = ReportsManager.GetReportsForEvent(this.eventGuid);
         List<ViewReports> reports = new List<ViewReports>();
 
         foreach (ReportInfo reportInfo in reportInfos)
         {
-            string userName = UsersManager.GetUser(reportInfo.userGUID).name;
-            ViewReports newReport = new ViewReports(userName, reportInfo.reportType.ToString());
+            string userName = UsersManager.GetUser(reportInfo.UserGUID).Name;
+            ViewReports newReport = new ViewReports(userName, reportInfo.ReportTypeValue.ToString());
             reports.Add(newReport);
         }
 
@@ -33,16 +34,13 @@ public partial class ReportsPage : ContentPage
 
     private void BackImageButton_Clicked(object sender, EventArgs e)
     {
-        Navigation.PopAsync();
+        this.Navigation.PopAsync();
     }
 }
-public class ViewReports
+
+public class ViewReports(string name, string report)
 {
-    public string UserName { get; set; }
-    public string Report { get; set; }
-    public ViewReports(String name, String report)
-    {
-        UserName = name;
-        Report = report;
-    }
+    public string UserName { get; set; } = name;
+
+    public string Report { get; set; } = report;
 }

@@ -1,30 +1,9 @@
-﻿/*namespace EventsApp;
-
-public partial class OrganizerInvitePage : ContentPage
+﻿namespace EventsApp
 {
-	public OrganizerInvitePage()
-	{
-		InitializeComponent();
-	}
-    private void CloseButton_Clicked(object sender, EventArgs e)
+    public class User(string username, string profilePicture)
     {
-        
-    }
-}	*/
+        public string Username { get; set; } = username;
 
-namespace EventsApp
-{
-    public class User
-    {
-        public string Username { get; set; }
-        public string ProfilePicture { get; set; }
-
-        // Additional properties as needed
-
-        public User(string username, string profilePicture)
-        {
-            Username = username;
-            ProfilePicture = profilePicture;
-        }
+        public string ProfilePicture { get; set; } = profilePicture;
     }
 }

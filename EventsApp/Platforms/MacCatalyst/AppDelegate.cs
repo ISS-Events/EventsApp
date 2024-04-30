@@ -1,7 +1,7 @@
-﻿using Foundation;
-
-namespace EventsApp
+﻿namespace EventsApp
 {
+    using Foundation;
+
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate
     {

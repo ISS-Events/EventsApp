@@ -1,32 +1,32 @@
-﻿using EventsApp.Logic.Adapters;
-using EventsApp.Logic.Entities;
-using EventsApp.Logic.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Managers
+﻿namespace EventsApp.Logic.Managers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Adapters;
+    using EventsApp.Logic.Entities;
+    using EventsApp.Logic.Extensions;
+
     public static class DonationsManager
     {
-        private static DataAdapter<DonationInfo> _adapter;
+        private static DataAdapter<DonationInfo> adapter;
 
         public static void Initialize(DataBaseAdapter<DonationInfo> adapter)
         {
-            _adapter = adapter;
+            DonationsManager.adapter = adapter;
         }
 
         public static DonationInfo GetDonation(Guid donationId)
         {
             DonationInfo donationInfo = new DonationInfo(donationId);
-            return _adapter.Get(donationInfo.GetIdentifier());
+            return adapter.Get(donationInfo.GetIdentifier());
         }
 
         public static List<DonationInfo> GetAllDonations()
         {
-            return _adapter.GetAll();
+            return adapter.GetAll();
         }
 
         public static List<DonationInfo> GetAllDonationsForEvent(Guid eventId)
@@ -34,18 +34,19 @@ namespace EventsApp.Logic.Managers
             List<DonationInfo> donationsForEvent = new List<DonationInfo>();
             foreach (DonationInfo donation in GetAllDonations())
             {
-                if (donation.eventGUID == eventId)
+                if (donation.EventGUID == eventId)
                 {
                     donationsForEvent.Add(donation);
                 }
             }
+
             return donationsForEvent;
         }
 
         public static void AddDonation(Guid userId, Guid eventId, float amount)
         {
             DonationInfo donationInfo = new DonationInfo(userId, eventId, amount);
-            _adapter.Add(donationInfo);
+            adapter.Add(donationInfo);
         }
 
         public static float GetTotalDonationsForEvent(Guid eventId)
@@ -53,8 +54,9 @@ namespace EventsApp.Logic.Managers
             float totalDonations = 0;
             foreach (DonationInfo donation in GetAllDonationsForEvent(eventId))
             {
-                totalDonations += donation.amount;
+                totalDonations += donation.Amount;
             }
+
             return totalDonations;
         }
 
@@ -63,25 +65,26 @@ namespace EventsApp.Logic.Managers
             List<DonationInfo> donationsFromUser = new List<DonationInfo>();
             foreach (DonationInfo donation in GetAllDonations())
             {
-                if (donation.userGUID == userId)
+                if (donation.UserGUID == userId)
                 {
                     donationsFromUser.Add(donation);
                 }
             }
+
             return donationsFromUser;
         }
 
         public static void RemoveDonation(Guid donationId)
         {
             DonationInfo donationInfo = new DonationInfo(donationId);
-            _adapter.Delete(donationInfo.GetIdentifier());
+            adapter.Delete(donationInfo.GetIdentifier());
         }
 
         public static void RemoveAllDonationsForEvent(Guid eventId)
         {
             foreach (DonationInfo donation in GetAllDonationsForEvent(eventId))
             {
-                _adapter.Delete(donation.GetIdentifier());
+                adapter.Delete(donation.GetIdentifier());
             }
         }
     }

@@ -1,38 +1,35 @@
-﻿using EventsApp.Logic.Attributes;
-using EventsApp.Logic.Entities;
-using EventsApp.Logic.Extensions;
-using EventsApp.Logic.Managers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Adapters
+﻿namespace EventsApp.Logic.Adapters
 {
-    /// <summary>
-    /// Parses csv files
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class CSVAdapter<T> : DataAdapter<T> where T : struct
-    {
-        string _filePath; // CSV file path
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Attributes;
+    using EventsApp.Logic.Entities;
+    using EventsApp.Logic.Extensions;
+    using EventsApp.Logic.Managers;
 
-        public CSVAdapter(string filePath) : base(filePath)
+    public class CSVAdapter<T>(string filePath)
+        : DataAdapter<T>(filePath)
+        where T : struct
+    {
+        private string filePath = AppDataInfo.ValidatePath(filePath); // CSV file path
+
+        public string GetPath()
         {
-            _filePath = AppDataInfo.ValidatePath(filePath);
+            return filePath;
         }
 
         public override void Connect()
         {
             // No connection needed
         }
-
         public override void Clear()
         {
             try
             {
-                System.IO.File.WriteAllText(_filePath, string.Empty);
+                System.IO.File.WriteAllText(this.filePath, string.Empty);
             }
             catch (Exception ex)
             {
@@ -42,14 +39,14 @@ namespace EventsApp.Logic.Adapters
 
         public override void Add(T item)
         {
-            List<T> items = GetAll();
+            List<T> items = this.GetAll();
             items.Add(item);
-            WriteToCSV(items);
+            this.WriteToCSV(items);
         }
 
         public override bool Contains(Identifier id)
         {
-            List<T> items = GetAll();
+            List<T> items = this.GetAll();
             foreach (T item in items)
             {
                 if (item.GetIdentifier().Equals(id))
@@ -57,14 +54,15 @@ namespace EventsApp.Logic.Adapters
                     return true;
                 }
             }
+
             return false;
         }
 
         public override void Delete(Identifier id)
         {
-            List<T> items = GetAll();
-            T item = Get(id);
-            
+            List<T> items = this.GetAll();
+            T item = this.Get(id);
+
             // Iterate and check their identifiers
             int index = -1;
 
@@ -77,14 +75,17 @@ namespace EventsApp.Logic.Adapters
                 }
             }
 
-            if(index != -1) items.RemoveAt(index);
+            if (index != -1)
+            {
+                items.RemoveAt(index);
+            }
 
-            WriteToCSV(items);
+            this.WriteToCSV(items);
         }
 
         public override T Get(Identifier id)
         {
-            List<T> items = GetAll();
+            List<T> items = this.GetAll();
 
             foreach (T item in items)
             {
@@ -103,7 +104,7 @@ namespace EventsApp.Logic.Adapters
 
             try
             {
-                using (var reader = new StreamReader(_filePath))
+                using (var reader = new StreamReader(this.filePath))
                 {
                     while (!reader.EndOfStream)
                     {
@@ -112,15 +113,14 @@ namespace EventsApp.Logic.Adapters
                         // We're working with structs, so reflection is tricky
                         // We'll match the fields and set their values to an instance
                         // of the generic type
-
-                        var values = line.Split(',');
+                        string[] values = line.Split(',');
 
                         if (typeof(T).IsValueType && !typeof(T).IsPrimitive && !typeof(T).IsEnum)
                         {
                             // For structs, we'll use a workaround to create an instance
                             var instance = Activator.CreateInstance<T>();
                             var fields = typeof(T).GetFields();
-                            
+
                             // We create a reference to the instance because structs are value types
                             // We cant use SetValue directly on the instance
                             // 7th page of google btw
@@ -158,18 +158,18 @@ namespace EventsApp.Logic.Adapters
 
         public override void Update(Identifier id, T item)
         {
-            List<T> items = GetAll();
-            T oldItem = Get(id);
+            List<T> items = this.GetAll();
+            T oldItem = this.Get(id);
             items.Remove(oldItem);
             items.Add(item);
-            WriteToCSV(items);
+            this.WriteToCSV(items);
         }
 
         private void WriteToCSV(List<T> items)
         {
             try
             {
-                using (var writer = new StreamWriter(_filePath))
+                using (var writer = new StreamWriter(this.filePath))
                 {
                     foreach (T item in items)
                     {
@@ -191,6 +191,5 @@ namespace EventsApp.Logic.Adapters
                 Console.WriteLine($"Error writing to CSV: {ex.Message}");
             }
         }
-
     }
 }

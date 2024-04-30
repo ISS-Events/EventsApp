@@ -1,33 +1,33 @@
-﻿using EventsApp.Logic.Adapters;
-using EventsApp.Logic.Attributes;
-using EventsApp.Logic.Entities;
-using EventsApp.Logic.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Managers
+﻿namespace EventsApp.Logic.Managers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Adapters;
+    using EventsApp.Logic.Attributes;
+    using EventsApp.Logic.Entities;
+    using EventsApp.Logic.Extensions;
+
     public class ReportsManager
     {
-        private static DataAdapter<ReportInfo> _adapter;
+        private static DataAdapter<ReportInfo> adapter;
 
         public static void Initialize(DataBaseAdapter<ReportInfo> adapter)
         {
-            _adapter = adapter;
+            ReportsManager.adapter = adapter;
         }
 
         public static List<ReportInfo> GetAllReports()
         {
-            return _adapter.GetAll();
+            return adapter.GetAll();
         }
 
         public static ReportInfo GetReport(Guid userId, Guid eventId)
         {
             ReportInfo reportInfo = new ReportInfo(userId, eventId);
-            return _adapter.Get(reportInfo.GetIdentifier());
+            return adapter.Get(reportInfo.GetIdentifier());
         }
 
         public static List<ReportInfo> GetReportsFromUser(Guid userId)
@@ -35,11 +35,12 @@ namespace EventsApp.Logic.Managers
             List<ReportInfo> reportInfos = new List<ReportInfo>();
             foreach (ReportInfo report in GetAllReports())
             {
-                if (report.userGUID == userId)
+                if (report.UserGUID == userId)
                 {
                     reportInfos.Add(report);
                 }
             }
+
             return reportInfos;
         }
 
@@ -48,32 +49,32 @@ namespace EventsApp.Logic.Managers
             List<ReportInfo> reportInfos = new List<ReportInfo>();
             foreach (ReportInfo report in GetAllReports())
             {
-                if (report.eventGUID == eventId)
+                if (report.EventGUID == eventId)
                 {
                     reportInfos.Add(report);
                 }
             }
+
             return reportInfos;
         }
-
 
         public static void AddReport(Guid userId, Guid eventId, ReportInfo.ReportType reportType)
         {
             ReportInfo reportInfo = new ReportInfo(userId, eventId, reportType);
-            _adapter.Add(reportInfo);
+            adapter.Add(reportInfo);
         }
 
         public static void RemoveReport(Guid userId, Guid eventId)
         {
             ReportInfo reportInfo = new ReportInfo(userId, eventId);
-            _adapter.Delete(reportInfo.GetIdentifier());
+            adapter.Delete(reportInfo.GetIdentifier());
         }
 
         public static void RemoveAllReportsForEvent(Guid eventId)
         {
             foreach (ReportInfo report in GetReportsForEvent(eventId))
             {
-                _adapter.Delete(report.GetIdentifier());
+                adapter.Delete(report.GetIdentifier());
             }
         }
 
@@ -81,22 +82,22 @@ namespace EventsApp.Logic.Managers
         {
             foreach (ReportInfo report in GetReportsFromUser(userId))
             {
-                _adapter.Delete(report.GetIdentifier());
+                adapter.Delete(report.GetIdentifier());
             }
         }
 
         public static void RemoveAllReports()
         {
-            _adapter.Clear();
+            adapter.Clear();
         }
 
         public static void RemoveAllReportsForEventAndUser(Guid userId, Guid eventId)
         {
             foreach (ReportInfo report in GetAllReports())
             {
-                if (report.userGUID == userId && report.eventGUID == eventId)
+                if (report.UserGUID == userId && report.EventGUID == eventId)
                 {
-                    _adapter.Delete(report.GetIdentifier());
+                    adapter.Delete(report.GetIdentifier());
                 }
             }
         }

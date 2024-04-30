@@ -1,8 +1,8 @@
-﻿using EventsApp.Logic.Managers;
-using Microsoft.Extensions.Logging;
-
-namespace EventsApp
+﻿namespace EventsApp
 {
+    using EventsApp.Logic.Managers;
+    using Microsoft.Extensions.Logging;
+
     public static class MauiProgram
     {
         public static MauiApp CreateMauiApp()
@@ -17,7 +17,7 @@ namespace EventsApp
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<EventPageUser>();

@@ -1,259 +1,296 @@
-﻿using EventsApp.Logic.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Entities
+﻿namespace EventsApp.Logic.Entities
 {
-    [Table("Users"), System.Serializable]
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Attributes;
+
+    [Table("Users")]
+    [System.Serializable]
     public struct UserInfo
     {
-        public const float MIN_SCORE = 4.0f;
+        public const float MINSCORE = 4.0f;
 
-        [PrimaryKey] public Guid GUID;
-        public string name;
-        public string password;
+        [PrimaryKey]
+        public Guid GUID;
+        public string Name;
+        public string Password;
 
         public UserInfo(Guid guid, string name, string password)
         {
-            GUID = guid;
-            this.name = name;
-            this.password = password;
+            this.GUID = guid;
+            this.Name = name;
+            this.Password = password;
         }
 
         public UserInfo(string name, string password)
         {
-            GUID = Guid.NewGuid();
-            this.name = name;
-            this.password = password;
+            this.GUID = Guid.NewGuid();
+            this.Name = name;
+            this.Password = password;
         }
 
         public UserInfo(Guid guid)
         {
-            GUID = guid;
-            name = "";
-            password = "";
+            this.GUID = guid;
+            this.Name = string.Empty;
+            this.Password = string.Empty;
         }
 
         public UserInfo()
         {
-            GUID = Guid.NewGuid();
-            name = "";
-            password = "";
+            this.GUID = Guid.NewGuid();
+            this.Name = string.Empty;
+            this.Password = string.Empty;
         }
     }
 
-    [Table("Events"), System.Serializable]
+    [Table("Events")]
+    [System.Serializable]
     public struct EventInfo
     {
-        [PrimaryKey] public Guid GUID;
-        public Guid organizerGUID;
-        public string eventName;
-        public string categories; // "music, sports, etc."
-        public string location;
-        public int maxParticipants;
-        public string description;
-        public DateTime startDate;
-        public DateTime endDate;
-        public string bannerURL;
-        public string logoURL;
-        public int ageLimit;
-        public float entryFee;
+        [PrimaryKey]
+        public Guid GUID;
+        public Guid OrganizerGUID;
+        public string EventName;
+        public string Categories; // "music, sports, etc."
+        public string Location;
+        public int MaxParticipants;
+        public string Description;
+        public DateTime StartDate;
+        public DateTime EndDate;
+        public string BannerURL;
+        public string LogoURL;
+        public int AgeLimit;
+        public float EntryFee;
 
         public EventInfo(Guid guid, Guid userGUID, string eventName, string categories, string location, int maxParticipants, string description, DateTime startDate, DateTime endDate, string bannerURL, string logoURL, int ageLimit, float entryFee)
         {
-            GUID = guid;
-            this.organizerGUID = userGUID;
-            this.eventName = eventName;
-            this.categories = categories;
-            this.location = location;
-            this.maxParticipants = maxParticipants;
-            this.description = description;
-            this.startDate = startDate;
-            this.endDate = endDate;
-            this.bannerURL = bannerURL;
-            this.logoURL = logoURL;
-            this.ageLimit = ageLimit;
-            this.entryFee = entryFee;
+            this.GUID = guid;
+            this.OrganizerGUID = userGUID;
+            this.EventName = eventName;
+            this.Categories = categories;
+            this.Location = location;
+            this.MaxParticipants = maxParticipants;
+            this.Description = description;
+            this.StartDate = startDate;
+            this.EndDate = endDate;
+            this.BannerURL = bannerURL;
+            this.LogoURL = logoURL;
+            this.AgeLimit = ageLimit;
+            this.EntryFee = entryFee;
         }
 
         public EventInfo(Guid userGUID, string eventName, string categories, string location, int maxParticipants, string description, DateTime startDate, DateTime endDate, string bannerURL, string logoURL, int ageLimit, float entryFee)
         {
-            GUID = Guid.NewGuid();
-            this.organizerGUID = userGUID;
-            this.eventName = eventName;
-            this.categories = categories;
-            this.location = location;
-            this.maxParticipants = maxParticipants;
-            this.description = description;
-            this.startDate = startDate;
-            this.endDate = endDate;
-            this.bannerURL = bannerURL;
-            this.logoURL = logoURL;
-            this.ageLimit = ageLimit;
-            this.entryFee = entryFee;
+            this.GUID = Guid.NewGuid();
+            this.OrganizerGUID = userGUID;
+            this.EventName = eventName;
+            this.Categories = categories;
+            this.Location = location;
+            this.MaxParticipants = maxParticipants;
+            this.Description = description;
+            this.StartDate = startDate;
+            this.EndDate = endDate;
+            this.BannerURL = bannerURL;
+            this.LogoURL = logoURL;
+            this.AgeLimit = ageLimit;
+            this.EntryFee = entryFee;
         }
 
         public EventInfo(Guid guid)
         {
-            GUID = guid;
-            organizerGUID = Guid.Empty;
-            eventName = "";
-            categories = "";
-            location = "";
-            maxParticipants = 0;
-            description = "";
-            startDate = DateTime.Now;
-            endDate = DateTime.Now;
-            bannerURL = "";
-            logoURL = "";
-            ageLimit = 0;
-            entryFee = 0;
+            this.GUID = guid;
+            this.OrganizerGUID = Guid.Empty;
+            this.EventName = string.Empty;
+            this.Categories = string.Empty;
+            this.Location = string.Empty;
+            this.MaxParticipants = 0;
+            this.Description = string.Empty;
+            this.StartDate = DateTime.Now;
+            this.EndDate = DateTime.Now;
+            this.BannerURL = string.Empty;
+            this.LogoURL = string.Empty;
+            this.AgeLimit = 0;
+            this.EntryFee = 0;
         }
     }
 
-    [Table("UsersEventsStatus"), System.Serializable]
+    [Table("UsersEventsStatus")]
+    [System.Serializable]
     public struct UserEventRelationInfo
     {
-        [PrimaryKey] public Guid userGUID;
-        [PrimaryKey] public Guid eventGUID;
-        public string status;
+        [PrimaryKey]
+        public Guid UserGUID;
+        [PrimaryKey]
+        public Guid EventGUID;
+        public string Status;
 
         public UserEventRelationInfo(Guid userGUID, Guid eventGUID, string status)
         {
-            this.userGUID = userGUID;
-            this.eventGUID = eventGUID;
-            this.status = status;
+            this.UserGUID = userGUID;
+            this.EventGUID = eventGUID;
+            this.Status = status;
         }
 
         public UserEventRelationInfo(Guid userGUID, Guid eventGUID)
         {
-            this.userGUID = userGUID;
-            this.eventGUID = eventGUID;
-            status = "";
+            this.UserGUID = userGUID;
+            this.EventGUID = eventGUID;
+            this.Status = string.Empty;
         }
     }
 
-    [Table("Reports"), System.Serializable]
+    [Table("Reports")]
+    [System.Serializable]
     public struct ReportInfo
     {
-        [PrimaryKey] public Guid userGUID;
-        [PrimaryKey] public Guid eventGUID;
-        public enum ReportType
-        {
-            Harassment,
-            Nudity,
-            Spam,
-            Violence,
-            None,
-            Fraud,
-            Offensive,
-            GuidelinesViolations
-        }
+        [PrimaryKey]
+        public Guid UserGUID;
+        [PrimaryKey]
+        public Guid EventGUID;
 
-        public ReportType reportType;
+        public ReportType ReportTypeValue;
 
         public ReportInfo(Guid userGUID, Guid eventGUID, ReportType reportType)
         {
-            this.userGUID = userGUID;
-            this.eventGUID = eventGUID;
-            this.reportType = reportType;
+            this.UserGUID = userGUID;
+            this.EventGUID = eventGUID;
+            this.ReportTypeValue = reportType;
         }
 
         public ReportInfo(Guid userGUID, Guid eventGUID)
         {
-            this.userGUID = userGUID;
-            this.eventGUID = eventGUID;
-            reportType = ReportType.Harassment;
+            this.UserGUID = userGUID;
+            this.EventGUID = eventGUID;
+            this.ReportTypeValue = ReportType.Harassment;
         }
 
+        public enum ReportType
+        {
+            /// <summary>
+            /// Harassment
+            /// </summary>
+            Harassment,
+
+            /// <summary>
+            /// Nudity
+            /// </summary>
+            Nudity,
+
+            /// <summary>
+            /// Spam
+            /// </summary>
+            Spam,
+
+            /// <summary>
+            /// Violence
+            /// </summary>
+            Violence,
+
+            /// <summary>
+            /// None
+            /// </summary>
+            None,
+
+            /// <summary>
+            /// Fraud
+            /// </summary>
+            Fraud,
+
+            /// <summary>
+            /// Offensive
+            /// </summary>
+            Offensive,
+
+            /// <summary>
+            /// GuidelinesViolations
+            /// </summary>
+            GuidelinesViolations,
+        }
     }
 
-    [Table("Reviews"), System.Serializable]
+    [Table("Reviews")]
+    [System.Serializable]
     public struct ReviewInfo
     {
-        [PrimaryKey] public Guid userGUID;
-        [PrimaryKey] public Guid eventGUID;
-        public float score;
-        public string reviewDescription;
+        [PrimaryKey]
+        public Guid UserGUID;
+        [PrimaryKey]
+        public Guid EventGUID;
+        public float Score;
+        public string ReviewDescription;
 
         public ReviewInfo(Guid userGUID, Guid eventGUID, float score, string reviewDescription)
         {
-            this.userGUID = userGUID;
-            this.eventGUID = eventGUID;
-            this.score = score;
-            this.reviewDescription = reviewDescription;
+            this.UserGUID = userGUID;
+            this.EventGUID = eventGUID;
+            this.Score = score;
+            this.ReviewDescription = reviewDescription;
         }
 
         public ReviewInfo(Guid userGUID, Guid eventGUID)
         {
-            this.userGUID = userGUID;
-            this.eventGUID = eventGUID;
-            score = 0;
-            reviewDescription = "";
+            this.UserGUID = userGUID;
+            this.EventGUID = eventGUID;
+            this.Score = 0;
+            this.ReviewDescription = string.Empty;
         }
     }
 
-    [Table("Expenses"), System.Serializable]
-    public struct ExpenseInfo
+    [Table("Expenses")]
+    [System.Serializable]
+    public struct ExpenseInfo(Guid guid, Guid eventGUID, string expenseName, float cost)
     {
-        [PrimaryKey] public Guid GUID;
-        public Guid eventGUID;
-        public string expenseName;
-        public float cost;
-
-        public ExpenseInfo(Guid guid, Guid eventGUID, string expenseName, float cost)
-        {
-            GUID = guid;
-            this.eventGUID = eventGUID;
-            this.expenseName = expenseName;
-            this.cost = cost;
-        }
+        [PrimaryKey]
+        public Guid GUID = guid;
+        public Guid EventGUID = eventGUID;
+        public string ExpenseName = expenseName;
+        public float Cost = cost;
     }
 
-    [Table("Donations"), System.Serializable]
+    [Table("Donations")]
+    [System.Serializable]
     public struct DonationInfo
     {
-        [PrimaryKey] public Guid GUID;
-        public Guid eventGUID;
-        public Guid userGUID;
-        public float amount;
+        [PrimaryKey]
+        public Guid GUID;
+        public Guid EventGUID;
+        public Guid UserGUID;
+        public float Amount;
 
         public DonationInfo(Guid guid, Guid eventGUID, Guid userGUID, float amount)
         {
-            GUID = guid;
-            this.eventGUID = eventGUID;
-            this.userGUID = userGUID;
-            this.amount = amount;
+            this.GUID = guid;
+            this.EventGUID = eventGUID;
+            this.UserGUID = userGUID;
+            this.Amount = amount;
         }
 
         public DonationInfo(Guid eventGUID, Guid userGUID, float amount)
         {
-            this.eventGUID = eventGUID;
-            this.userGUID = userGUID;
-            this.amount = amount;
-            GUID = Guid.NewGuid();
+            this.EventGUID = eventGUID;
+            this.UserGUID = userGUID;
+            this.Amount = amount;
+            this.GUID = Guid.NewGuid();
         }
 
         public DonationInfo(Guid guid)
         {
-            GUID = guid;
-            eventGUID = Guid.Empty;
-            userGUID = Guid.Empty;
-            amount = 0;
+            this.GUID = guid;
+            this.EventGUID = Guid.Empty;
+            this.UserGUID = Guid.Empty;
+            this.Amount = 0;
         }
     }
 
-    [Table("Admins"), System.Serializable]
-    public struct AdminInfo
+    [Table("Admins")]
+    [System.Serializable]
+    public struct AdminInfo(Guid guid)
     {
-        [PrimaryKey] public Guid GUID;
-
-        public AdminInfo(Guid guid)
-        {
-            GUID = guid;
-        }
+        [PrimaryKey]
+        public Guid GUID = guid;
     }
 }

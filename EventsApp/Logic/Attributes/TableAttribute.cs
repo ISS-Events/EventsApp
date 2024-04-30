@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Attributes
+﻿namespace EventsApp.Logic.Attributes
 {
-    public class TableAttribute : Attribute
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    public class TableAttribute(string tableName)
+        : Attribute
     {
-        string _tableName;
+        private string tableName = tableName;
+
         public string TableName
         {
             get
             {
-                return _tableName;
+                return this.tableName;
             }
-        }
-
-        public TableAttribute(string tableName)
-        {
-            _tableName = tableName;
         }
     }
 }

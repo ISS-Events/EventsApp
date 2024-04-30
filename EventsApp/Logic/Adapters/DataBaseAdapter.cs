@@ -1,81 +1,33 @@
-﻿using EventsApp.Logic.Attributes;
-using EventsApp.Logic.Managers;
-using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Logic.Adapters
+﻿namespace EventsApp.Logic.Adapters
 {
-    public class DataBaseAdapter<T> : DataAdapter<T> where T : struct
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Attributes;
+    using EventsApp.Logic.Managers;
+    using Microsoft.Data.SqlClient;
+
+    public class DataBaseAdapter<T>(string filePath)
+        : DataAdapter<T>(filePath)
+        where T : struct
     {
-        string _connectionString; // CSV file path
-        string TableName => typeof(T).GetCustomAttributes(typeof(TableAttribute), true).Cast<TableAttribute>().FirstOrDefault().TableName;
+        private string connectionString = filePath; // CSV file path
 
-        public DataBaseAdapter(string filePath) : base(filePath)
+        private string TableName => typeof(T).GetCustomAttributes(typeof(TableAttribute), true).Cast<TableAttribute>().FirstOrDefault().TableName;
+
+        public string ConnectionString()
         {
-            _connectionString = filePath;
-        }
-
-        private string GetFields()
-        {
-            string fields = "";
-            Type type = typeof(T);
-            foreach (var property in type.GetFields())
-            {
-                // Skip if enum
-                if (property.FieldType.IsEnum || property.IsLiteral)
-                {
-                    continue;
-                }
-
-                fields += $"{property.Name}, ";
-            }
-            return fields.Substring(0, fields.Length - 2);
-        }
-
-        private string GetValues(object o)
-        {
-            string values = "";
-            Type type = typeof(T);
-
-            foreach (var property in type.GetFields())
-            {
-                // If enum or const
-                if (property.FieldType.IsEnum || property.IsLiteral)
-                {
-                    continue;
-                }
-
-                if (property.FieldType == typeof(string))
-                {
-                    values += $"'{property.GetValue(o)}', ";
-                }
-                else if (property.FieldType == typeof(Guid))
-                {
-                    values += $"'{property.GetValue(o)}', ";
-                }
-                else if (property.FieldType == typeof(DateTime))
-                {
-                    values += $"'{property.GetValue(o)}', ";
-                }
-                else
-                {
-                    values += $"{property.GetValue(o)}, ";
-                }
-            }
-
-            return values.Substring(0, values.Length - 2);
+            return connectionString;
         }
 
         public override void Add(T item)
         {
-            string fields = GetFields();
-            string values = GetValues(item);
-            string insertUserQuery = $"INSERT INTO {TableName} ({fields}) VALUES" + $"({values})";
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            string fields = this.GetFields();
+            string values = this.GetValues(item);
+            string insertUserQuery = $"INSERT INTO {this.TableName} ({fields}) VALUES" + $"({values})";
+            using (SqlConnection connection = new SqlConnection(this.connectionString))
             {
                 SqlCommand command = new SqlCommand(insertUserQuery, connection);
                 try
@@ -92,8 +44,8 @@ namespace EventsApp.Logic.Adapters
 
         public override void Clear()
         {
-            string clearQuery = $"DELETE FROM {TableName}";
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            string clearQuery = $"DELETE FROM {this.TableName}";
+            using (SqlConnection connection = new SqlConnection(this.connectionString))
             {
                 SqlCommand command = new SqlCommand(clearQuery, connection);
                 try
@@ -110,21 +62,21 @@ namespace EventsApp.Logic.Adapters
 
         public override void Connect()
         {
-            
         }
 
         public override bool Contains(Identifier id)
         {
             Dictionary<string, object> pks = id.PrimaryKeys;
 
-            string selectQuery = $"SELECT * FROM {TableName} WHERE ";
+            string selectQuery = $"SELECT * FROM {this.TableName} WHERE ";
             foreach (var pk in pks)
             {
                 selectQuery += $"{pk.Key} = '{pk.Value}' AND ";
             }
+
             selectQuery = selectQuery.Substring(0, selectQuery.Length - 5);
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(this.connectionString))
             {
                 SqlCommand command = new SqlCommand(selectQuery, connection);
                 try
@@ -146,14 +98,15 @@ namespace EventsApp.Logic.Adapters
         {
             Dictionary<string, object> pks = id.PrimaryKeys;
 
-            string deleteQuery = $"DELETE FROM {TableName} WHERE ";
+            string deleteQuery = $"DELETE FROM {this.TableName} WHERE ";
             foreach (var pk in pks)
             {
                 deleteQuery += $"{pk.Key} = '{pk.Value}' AND ";
             }
+
             deleteQuery = deleteQuery.Substring(0, deleteQuery.Length - 5);
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(this.connectionString))
             {
                 SqlCommand command = new SqlCommand(deleteQuery, connection);
                 try
@@ -172,14 +125,15 @@ namespace EventsApp.Logic.Adapters
         {
             Dictionary<string, object> pks = id.PrimaryKeys;
 
-            string selectQuery = $"SELECT * FROM {TableName} WHERE ";
+            string selectQuery = $"SELECT * FROM {this.TableName} WHERE ";
             foreach (var pk in pks)
             {
                 selectQuery += $"{pk.Key} = '{pk.Value}' AND ";
             }
+
             selectQuery = selectQuery.Substring(0, selectQuery.Length - 5);
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(this.connectionString))
             {
                 SqlCommand command = new SqlCommand(selectQuery, connection);
                 try
@@ -188,7 +142,7 @@ namespace EventsApp.Logic.Adapters
                     var reader = command.ExecuteReader();
                     if (reader.Read())
                     {
-                        T instance = new T();
+                        T instance = default(T);
                         Type type = typeof(T);
                         TypedReference reference = __makeref(instance);
 
@@ -241,9 +195,9 @@ namespace EventsApp.Logic.Adapters
         {
             List<T> list = new List<T>();
 
-            string selectAllQuery = $"SELECT * FROM {TableName}";
+            string selectAllQuery = $"SELECT * FROM {this.TableName}";
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(this.connectionString))
             {
                 SqlCommand command = new SqlCommand(selectAllQuery, connection);
                 try
@@ -252,7 +206,7 @@ namespace EventsApp.Logic.Adapters
                     var reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        T instance = new T();
+                        T instance = default(T);
                         Type type = typeof(T);
                         TypedReference reference = __makeref(instance);
 
@@ -305,7 +259,7 @@ namespace EventsApp.Logic.Adapters
         {
             Dictionary<string, object> pks = id.PrimaryKeys;
 
-            string updateQuery = $"UPDATE {TableName} SET ";
+            string updateQuery = $"UPDATE {this.TableName} SET ";
             Type type = typeof(T);
             foreach (var property in type.GetFields())
             {
@@ -331,6 +285,7 @@ namespace EventsApp.Logic.Adapters
                     updateQuery += $"{property.Name} = {property.GetValue(item)}, ";
                 }
             }
+
             updateQuery = updateQuery.Substring(0, updateQuery.Length - 2);
 
             updateQuery += " WHERE ";
@@ -338,9 +293,10 @@ namespace EventsApp.Logic.Adapters
             {
                 updateQuery += $"{pk.Key} = '{pk.Value}' AND ";
             }
+
             updateQuery = updateQuery.Substring(0, updateQuery.Length - 5);
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(this.connectionString))
             {
                 SqlCommand command = new SqlCommand(updateQuery, connection);
                 try
@@ -353,6 +309,58 @@ namespace EventsApp.Logic.Adapters
                     Console.WriteLine(ex.Message);
                 }
             }
+        }
+
+        private string GetFields()
+        {
+            string fields = string.Empty;
+            Type type = typeof(T);
+            foreach (var property in type.GetFields())
+            {
+                // Skip if enum
+                if (property.FieldType.IsEnum || property.IsLiteral)
+                {
+                    continue;
+                }
+
+                fields += $"{property.Name}, ";
+            }
+
+            return fields.Substring(0, fields.Length - 2);
+        }
+
+        private string GetValues(object o)
+        {
+            string values = string.Empty;
+            Type type = typeof(T);
+
+            foreach (var property in type.GetFields())
+            {
+                // If enum or const
+                if (property.FieldType.IsEnum || property.IsLiteral)
+                {
+                    continue;
+                }
+
+                if (property.FieldType == typeof(string))
+                {
+                    values += $"'{property.GetValue(o)}', ";
+                }
+                else if (property.FieldType == typeof(Guid))
+                {
+                    values += $"'{property.GetValue(o)}', ";
+                }
+                else if (property.FieldType == typeof(DateTime))
+                {
+                    values += $"'{property.GetValue(o)}', ";
+                }
+                else
+                {
+                    values += $"{property.GetValue(o)}, ";
+                }
+            }
+
+            return values.Substring(0, values.Length - 2);
         }
     }
 }

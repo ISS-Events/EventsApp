@@ -5,12 +5,12 @@ namespace EventsApp;
 
 public partial class EventInfoPage : ContentPage
 {
-	public EventCard CurrentEvent { get; set; }
+    public EventCard CurrentEvent { get; set; }
 
-	public EventInfoPage(Guid eventGUID)
+    public EventInfoPage(Guid eventGUID)
     {
-        BindingContext = this;
-        CurrentEvent = new EventCard(EventsManager.GetEvent(eventGUID));
-        InitializeComponent();
-	}
+        this.BindingContext = this;
+        this.CurrentEvent = new EventCard(EventsManager.GetEvent(eventGUID));
+        this.InitializeComponent();
+    }
 }

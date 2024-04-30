@@ -1,33 +1,71 @@
-﻿using EventsApp.Logic.Entities;
-using EventsApp.Logic.Managers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventsApp.Model_View.Entities
+﻿namespace EventsApp.Model_View.Entities
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Threading.Tasks;
+    using EventsApp.Logic.Entities;
+    using EventsApp.Logic.Managers;
+
     public class Event : INotifyPropertyChanged
     {
+        private bool interested;
+
         public event PropertyChangedEventHandler PropertyChanged;
+
         public string? GUID { get; set; }
+
         public string? Picture { get; set; }
+
         public string? Organizer { get; set; }
+
         public string? Name { get; set; }
+
         public string Description { get; set; }
+
         public string? Location { get; set; }
+
         public string StartDate { get; set; }
+
         public string? Price { get; set; }
+
         public int NoOfParticipants { get; set; }
+
+        public Event(string gUID, string picture, string organizer, string name, string description, string location, string date, string price, int participants)
+        {
+            this.GUID = gUID;
+            this.Picture = picture;
+            this.Organizer = organizer;
+            this.Name = name;
+            this.Description = description;
+            this.Location = location;
+            this.StartDate = date;
+            this.Price = price;
+            this.NoOfParticipants = participants;
+        }
+
+        public Event(EventInfo eventInfo)
+        {
+            this.GUID = eventInfo.GUID.ToString();
+            this.Picture = eventInfo.BannerURL;
+            this.Organizer = UsersManager.GetUser(eventInfo.OrganizerGUID).Name;
+            this.Name = eventInfo.EventName;
+            this.Description = eventInfo.Description;
+            this.Location = eventInfo.Location;
+            this.StartDate = eventInfo.StartDate.Date.ToString();
+            this.Price = eventInfo.EntryFee.ToString();
+            this.NoOfParticipants = eventInfo.MaxParticipants;
+            this.UpdateInterestedStatus();
+        }
 
         public string HostInfoString
         {
             get
             {
-                return "Hosted by " + Organizer;
+                return "Hosted by " + this.Organizer;
             }
         }
 
@@ -35,15 +73,15 @@ namespace EventsApp.Model_View.Entities
         {
             get
             {
-                return Price + " EUR";
+                return this.Price + " EUR";
             }
         }
 
-        public string ParticipantsInfoString 
+        public string ParticipantsInfoString
         {
             get
             {
-                return $"{EventsManager.GetNumberOfParticipants(Guid.Parse(GUID))} / {NoOfParticipants.ToString()}";
+                return $"{EventsManager.GetNumberOfParticipants(Guid.Parse(this.GUID))} / {this.NoOfParticipants.ToString()}";
             }
         }
 
@@ -51,17 +89,15 @@ namespace EventsApp.Model_View.Entities
         {
             get
             {
-                return StartDate;
+                return this.StartDate;
             }
         }
-
-        private bool _interested;
 
         public string InterestedStar
         {
             get
             {
-                if (_interested)
+                if (this.interested)
                 {
                     return "star_filled.png";
                 }
@@ -71,29 +107,9 @@ namespace EventsApp.Model_View.Entities
                 }
             }
         }
-
-        public void UpdateInterestedStatus()
-        {
-            if (UsersManager.IsInterested(AppStateManager.currentUserGUID, Guid.Parse(GUID)) ||
-                UsersManager.IsGoing(AppStateManager.currentUserGUID, Guid.Parse(GUID)))
-            {
-                _interested = true;
-            }
-            else
-            {
-                _interested = false;
-            }
-            OnPropertyChanged(nameof(InterestedStar));
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        
         public string GetStar()
         {
-            if (_interested)
+            if (this.interested)
             {
                 return "star_filled.png";
             }
@@ -103,31 +119,24 @@ namespace EventsApp.Model_View.Entities
             }
         }
 
-        public Event(string GUID, string picture, string organizer, string name, string description, string location, string date, string price, int participants)
+        public void UpdateInterestedStatus()
         {
-            this.GUID = GUID;
-            Picture = picture;
-            Organizer = organizer;
-            Name = name;
-            Description = description;
-            Location = location;
-            StartDate = date;
-            Price = price;
-            NoOfParticipants = participants;
+            if (UsersManager.IsInterested(AppStateManager.CurrentUserGUID, Guid.Parse(this.GUID)) ||
+                UsersManager.IsGoing(AppStateManager.CurrentUserGUID, Guid.Parse(this.GUID)))
+            {
+                this.interested = true;
+            }
+            else
+            {
+                this.interested = false;
+            }
+
+            this.OnPropertyChanged(nameof(this.InterestedStar));
         }
 
-        public Event(EventInfo eventInfo)
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            GUID = eventInfo.GUID.ToString();
-            Picture = eventInfo.bannerURL;
-            Organizer = UsersManager.GetUser(eventInfo.organizerGUID).name;
-            Name = eventInfo.eventName;
-            Description = eventInfo.description;
-            Location = eventInfo.location;
-            StartDate = eventInfo.startDate.Date.ToString();
-            Price = eventInfo.entryFee.ToString();
-            NoOfParticipants = eventInfo.maxParticipants;
-            UpdateInterestedStatus();
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

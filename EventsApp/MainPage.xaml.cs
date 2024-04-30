@@ -1,25 +1,26 @@
-﻿using EventsApp.Logic.Adapters;
-using EventsApp.Logic.Entities;
-using EventsApp.Logic.Extensions;
-using EventsApp.Logic.Managers;
-using EventsApp.Model_View.Entities;
-using Microsoft.Maui.Controls;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace EventsApp
+﻿namespace EventsApp
 {
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+    using EventsApp.Logic.Adapters;
+    using EventsApp.Logic.Entities;
+    using EventsApp.Logic.Extensions;
+    using EventsApp.Logic.Managers;
+    using EventsApp.Model_View.Entities;
+    using Microsoft.Maui.Controls;
+
     public partial class MainPage : ContentPage
     {
-        int count = 0;
-        Label label;
-        DateTime date = DateTime.Now;
-        string FormattedDate;
+        public int Count = 0;
+        public Label Label;
+        public DateTime Date = DateTime.Now;
+        public string FormattedDate;
 
-        public ObservableCollection<Event> Events { 
-            get; 
-            set; 
+        public ObservableCollection<Event> Events
+        {
+            get;
+            set;
         }
 
         private ObservableCollection<Event> GetEvents(string sortOptions = null)
@@ -27,7 +28,7 @@ namespace EventsApp
             List<EventInfo> eventInfos = new List<EventInfo>();
 
             EventsManager.GetAllEvents();
-            string sortOption = EventsSort.SelectedItem?.ToString() ?? "";
+            string sortOption = this.EventsSort.SelectedItem?.ToString() ?? string.Empty;
 
             switch (sortOption)
             {
@@ -52,7 +53,7 @@ namespace EventsApp
                 Event newEvent = new Event(eventInfo);
                 events.Add(newEvent);
                 newEvent.UpdateInterestedStatus();
-                OnPropertyChanged(nameof(newEvent.InterestedStar));
+                this.OnPropertyChanged(nameof(newEvent.InterestedStar));
                 newEvent.UpdateInterestedStatus();
             }
 
@@ -61,8 +62,8 @@ namespace EventsApp
 
         public MainPage()
         {
-            InitializeComponent();
-            FormattedDate = date.ToString("dddd, d MMM, hh:mm tt");
+            this.InitializeComponent();
+            this.FormattedDate = this.Date.ToString("dddd, d MMM, hh:mm tt");
             /*
             Events = new ObservableCollection<Event>
             {
@@ -70,49 +71,53 @@ namespace EventsApp
                 new Event("ubb_logo.png", "UBB Cluj", "Job Fair", "Cluj, Dorobantilor", FormattedDate, "Free", 110, false, "star_empty.png")
             };*/
 
-            RefreshEvents();
+            this.RefreshEvents();
         }
 
         private void RefreshInterestedStars()
         {
-            foreach (Event ev in Events)
+            foreach (Event ev in this.Events)
             {
                 ev.UpdateInterestedStatus();
-                OnPropertyChanged(nameof(ev.InterestedStar));
+                this.OnPropertyChanged(nameof(ev.InterestedStar));
                 ev.UpdateInterestedStatus();
             }
-            BindingContext = this;
+
+            this.BindingContext = this;
         }
 
         private void RefreshAllEvents()
         {
-
         }
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            RefreshEvents();
-            //RefreshInterestedStars();
+            this.RefreshEvents();
+            // RefreshInterestedStars();
         }
 
         public void OnSortChanged(object sender, EventArgs e)
         {
-            RefreshEvents();
+            this.RefreshEvents();
         }
 
         public void RefreshEvents()
         {
-            if(Events != null) Events.Clear();
-            Events = GetEvents();
-            OnPropertyChanged(nameof(Events));
-            BindingContext = this;
+            if (this.Events != null)
+            {
+                this.Events.Clear();
+            }
+
+            this.Events = this.GetEvents();
+            this.OnPropertyChanged(nameof(this.Events));
+            this.BindingContext = this;
         }
 
         #region Event Handlers
-        async void OnEventClicked(object sender, EventArgs e)
+        public async void OnEventClicked(object sender, EventArgs e)
         {
-            string guid = "";
+            string guid = string.Empty;
             Grid imageSender = (Grid)sender;
             if (imageSender.GestureRecognizers.Count > 0)
             {
@@ -120,30 +125,30 @@ namespace EventsApp
                 guid = (string)gesture.CommandParameter;
             }
 
-            await Navigation.PushAsync(new EventPageUser(guid));
+            await this.Navigation.PushAsync(new EventPageUser(guid));
         }
 
-        void OnImageButtonClicked(object sender, EventArgs e)
+        public void OnImageButtonClicked(object sender, EventArgs e)
         {
-            Shell.Current.Navigation.PushAsync(new AddOrEditPage(AppStateManager.currentUserGUID, Guid.Empty, false));
+            Shell.Current.Navigation.PushAsync(new AddOrEditPage(AppStateManager.CurrentUserGUID, Guid.Empty, false));
         }
 
         private void OnSearchBarTextChanged(object sender, EventArgs e)
         {
-            string searchText = EventsSearchBar.Text;
+            string searchText = this.EventsSearchBar.Text;
             List<string> searchResults = new List<string>
             {
                 "Result 1 for " + searchText,
                 "Result 2 for " + searchText,
-                "Result 3 for " + searchText
+                "Result 3 for " + searchText,
             };
-            SearchResultsListView.ItemsSource = searchResults;
-            SearchResultsListView.IsVisible = !string.IsNullOrEmpty(searchText); ;
+            this.SearchResultsListView.ItemsSource = searchResults;
+            this.SearchResultsListView.IsVisible = !string.IsNullOrEmpty(searchText);
         }
 
         private void OnFilterClicked(object sender, EventArgs e)
         {
-            FilterOptions.IsVisible = !FilterOptions.IsVisible;
+            this.FilterOptions.IsVisible = !this.FilterOptions.IsVisible;
         }
 
         private void OnStarTapped(object sender, EventArgs e)
@@ -151,13 +156,13 @@ namespace EventsApp
             Image tappedStar = (Image)sender;
             Event tappedEvent = (Event)tappedStar.BindingContext;
 
-            if(!UsersManager.IsInterested(AppStateManager.currentUserGUID, Guid.Parse(tappedEvent.GUID)))
+            if (!UsersManager.IsInterested(AppStateManager.CurrentUserGUID, Guid.Parse(tappedEvent.GUID)))
             {
-                UsersManager.SetInterestedStatus(AppStateManager.currentUserGUID, Guid.Parse(tappedEvent.GUID));
+                UsersManager.SetInterestedStatus(AppStateManager.CurrentUserGUID, Guid.Parse(tappedEvent.GUID));
             }
             else
             {
-                UsersManager.RemoveInterestedStatus(AppStateManager.currentUserGUID, Guid.Parse(tappedEvent.GUID));
+                UsersManager.RemoveInterestedStatus(AppStateManager.CurrentUserGUID, Guid.Parse(tappedEvent.GUID));
             }
 
             tappedEvent.UpdateInterestedStatus();
